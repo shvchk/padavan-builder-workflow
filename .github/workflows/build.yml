@@ -1,0 +1,107 @@
+name: Build firmware
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+    - uses: actions/checkout@v4
+
+    - run: |
+        . <(cat variables build.config)
+        for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
+          echo "$v=${!v}" >> $GITHUB_ENV
+        done
+
+    - run: |
+        apt update
+        apt install --no-install-recommends -y \
+            autoconf \
+            autoconf-archive \
+            automake \
+            autopoint \
+            bison \
+            build-essential \
+            ca-certificates \
+            cmake \
+            cpio \
+            curl \
+            doxygen \
+            fakeroot \
+            flex \
+            gawk \
+            gettext \
+            git \
+            gperf \
+            help2man \
+            kmod \
+            libblkid-dev \
+            libc-ares-dev \
+            libcurl4-openssl-dev \
+            libdevmapper-dev \
+            libev-dev \
+            libevent-dev \
+            libexif-dev \
+            libflac-dev \
+            libgmp3-dev \
+            libid3tag0-dev \
+            libjpeg-dev \
+            libkeyutils-dev \
+            libltdl-dev \
+            libmpc-dev \
+            libmpfr-dev \
+            libncurses5-dev \
+            libogg-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            libtool \
+            libtool-bin \
+            libudev-dev \
+            libvorbis-dev \
+            libxml2-dev \
+            locales \
+            pkg-config \
+            ppp-dev \
+            python3 \
+            python3-docutils \
+            texinfo \
+            unzip \
+            uuid \
+            uuid-dev \
+            vim \
+            wget \
+            xxd \
+            zlib1g-dev \
+            zstd
+
+    - run: |
+        locale-gen --no-purge en_US.UTF-8 ru_RU.UTF-8
+        export LANG="en_US.UTF-8"
+        export LC_ALL="en_US.UTF-8"
+
+    - run: |
+        git clone --depth 1 -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
+        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+        cp build.config padavan-ng/trunk/.config
+        cd padavan-ng/trunk
+        ./clear_tree.sh
+        ./build_firmware.sh
+
+    - run: cp padavan-ng/trunk/images/*trx .
+
+    - run: echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: padavan-ng_${{ env.CONFIG_VENDOR }}_${{ env.CONFIG_FIRMWARE_PRODUCT_ID }}_${{ env.BUILD_TIMESTAMP }}
+        retention-days: 7
+        path: |
+          *trx
+          build.config
