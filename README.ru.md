@@ -1,10 +1,15 @@
-## Workflow для автоматическй сборки прошивки Padavan
+## Workflow для автоматическй сборки прошивки padavan-ng
 
 ### Использование
 
 - [Форкните репозиторий](https://github.com/shvchk/padavan-builder-workflow/fork), далее всё выполняйте в своём форке
+
 - Скопируйте свой конфиг сборки в [build.config](build.config)
+
+  Шаблон конфига для вашего устройства можно взять в [репозитории прошивки](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
+
 - Запустите сборку: Actions → Build firmware → Run workflow
+
 - Когда сборка закончится, индикатор статуса процесса станет зелёным с галочкой
   ![screenshot-1](https://github.com/shvchk/padavan-builder-workflow/assets/872945/a444d460-00e4-4bd0-993e-6a8ea8327c29)
 
