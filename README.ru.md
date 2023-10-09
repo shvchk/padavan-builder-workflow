@@ -2,8 +2,8 @@
 
 ### Использование
 
-- [Форкните репозиторий](https://github.com/shvchk/padavan-builder-workflow/fork), далее всё выполняйте в нём
-- Скопируйте свой конфиг в [build.config](build.config)
+- [Форкните репозиторий](https://github.com/shvchk/padavan-builder-workflow/fork), далее всё выполняйте в своём форке
+- Скопируйте свой конфиг сборки в [build.config](build.config)
 - Запустите сборку: Actions → Build firmware → Run workflow
 - Когда сборка закончится, индикатор статуса процесса станет зелёным с галочкой
   ![screenshot-1](https://github.com/shvchk/padavan-builder-workflow/assets/872945/a444d460-00e4-4bd0-993e-6a8ea8327c29)
