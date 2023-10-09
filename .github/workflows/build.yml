@@ -21,8 +21,8 @@ jobs:
         done
 
     - run: |
-        apt update
-        apt install --no-install-recommends -y \
+        sudo apt update
+        sudo apt install --no-install-recommends -y \
             autoconf \
             autoconf-archive \
             automake \
@@ -82,7 +82,7 @@ jobs:
             zstd
 
     - run: |
-        locale-gen --no-purge en_US.UTF-8 ru_RU.UTF-8
+        sudo locale-gen --no-purge en_US.UTF-8 ru_RU.UTF-8
         export LANG="en_US.UTF-8"
         export LC_ALL="en_US.UTF-8"
 
