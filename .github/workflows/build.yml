@@ -93,6 +93,7 @@ jobs:
     - name: Download sources and toolchain
       run: |
         git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
+        git checkout "$PADAVAN_COMMIT"
         wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
 
     - name: Build firmware
