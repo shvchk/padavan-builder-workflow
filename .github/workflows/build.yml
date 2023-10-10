@@ -16,6 +16,7 @@ jobs:
 
     - name: Get variables
       run: |
+        sed -i 's|\r$||g' variables build.config
         . <(cat variables build.config)
         for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
           echo "$v=${!v}" >> $GITHUB_ENV
