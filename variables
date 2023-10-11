@@ -1,4 +1,4 @@
-PADAVAN_REPO=https://gitlab.com/a-shevchuk/padavan-ng
-PADAVAN_BRANCH=master
-PADAVAN_COMMIT=HEAD
-PADAVAN_TOOLCHAIN_URL=${PADAVAN_REPO}/-/jobs/5199075640/artifacts/raw/toolchain.tzst
+PADAVAN_REPO="https://gitlab.com/a-shevchuk/padavan-ng.git"
+PADAVAN_BRANCH="master"
+PADAVAN_COMMIT="HEAD"
+PADAVAN_TOOLCHAIN_URL="https://gitlab.com/api/v4/projects/a-shevchuk%2Fpadavan-ng/packages/generic/toolchain/latest/toolchain.tzst"
