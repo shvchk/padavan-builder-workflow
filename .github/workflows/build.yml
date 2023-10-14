@@ -100,7 +100,7 @@ jobs:
         wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
 
     - name: Run custom pre-build script
-      run: '[[ -f pre-build.sh ]] && . pre-build.sh'
+      run: '[[ -f pre-build.sh ]] && . pre-build.sh || :'
 
     - name: Build firmware
       run: |
@@ -111,7 +111,7 @@ jobs:
         popd
 
     - name: Run custom post-build script
-      run: '[[ -f post-build.sh ]] && . post-build.sh'
+      run: '[[ -f post-build.sh ]] && . post-build.sh || :'
 
     - name: Prepare artifacts
       run: |
