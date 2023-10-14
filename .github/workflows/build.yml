@@ -97,12 +97,18 @@ jobs:
         git checkout "$PADAVAN_COMMIT"
         wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
 
+    - name: Run custom pre-build script
+      run: '[[ -f pre-build.sh ]] && . pre-build.sh'
+
     - name: Build firmware
       run: |
         cp build.config padavan-ng/trunk/.config
         cd padavan-ng/trunk
         ./clear_tree.sh
         ./build_firmware.sh
+
+    - name: Run custom post-build script
+      run: '[[ -f post-build.sh ]] && . post-build.sh'
 
     - name: Prepare artifacts
       run: |
