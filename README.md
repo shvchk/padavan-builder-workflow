@@ -6,7 +6,7 @@
 
 - [Fork this repository](https://github.com/shvchk/padavan-builder-workflow/fork), further steps should be performed in your fork
 
-- Copy your build config to [build.config](build.config)
+- Copy your build config to [`build.config`](build.config)
 
   Build config template can be found in the [firmware repository](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
 

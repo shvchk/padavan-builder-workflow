@@ -6,7 +6,7 @@
 
 - [Форкните репозиторий](https://github.com/shvchk/padavan-builder-workflow/fork), дальнейшие шаги выполняйте в своём форке
 
-- Скопируйте свой конфиг сборки в [build.config](build.config)
+- Скопируйте свой конфиг сборки в [`build.config`](build.config)
 
   Шаблон конфига для вашего устройства можно взять в [репозитории прошивки](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
 
