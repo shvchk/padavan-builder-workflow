@@ -49,6 +49,14 @@
   If you can't figure out the problen on your own, you can ask community or firmware developer for help. In this case don't forget to attach the log archive.
 
 
+### Advanced usage
+
+You can set firmware repository, branch, specific tag or commit in [`variables`](variables) file.
+
+You can also create `pre-build.sh` script with any custom commands, which will be executed just before build process. By that time firmware source code is already downloaded, so you can add or change anything in it.
+
+You can also create `post-build.sh` script, which will be executed right after build process.
+
 ---
 
 Discussion: https://github.com/shvchk/padavan-builder-workflow/discussions/categories/general
