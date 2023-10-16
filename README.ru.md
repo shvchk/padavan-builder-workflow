@@ -39,6 +39,7 @@
   ![workflow details fail](misc/workflow-details-fail.webp)
 
   Откроется отчёт о выполнении задачи:
+
   ![workflow details get logs](misc/workflow-details-get-logs.webp)
 
   Здесь сразу видно, что ошибка возникла на шаге Check firmware size — проверки размера прошивки — этот шаг отмечен красным кружком с крестиком. Далее указана конкретная причина: Firmware size (18443033) exceeds max size (16187392) — то есть размер собранной прошивки превышает максимально допустимый для устройства размер.

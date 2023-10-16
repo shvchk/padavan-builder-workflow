@@ -39,6 +39,7 @@
   ![workflow details fail](misc/workflow-details-fail.webp)
 
   Job report will open:
+
   ![workflow details get logs](misc/workflow-details-get-logs.webp)
 
   Here we can quickly see that it was "Check firmware size" step that failed — it's marked with a red circle with a cross. Specific reason is shown below: Firmware size (18443033) exceeds max size (16187392) — i.e. firmware is too big for target device.
