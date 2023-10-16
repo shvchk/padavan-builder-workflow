@@ -4,7 +4,7 @@
 
 ### Usage
 
-- [Fork this repository](https://github.com/shvchk/padavan-builder-workflow/fork), further steps perform in your fork
+- [Fork this repository](https://github.com/shvchk/padavan-builder-workflow/fork), further steps should be performed in your fork
 
 - Copy your build config to [build.config](build.config)
 
