@@ -1,6 +1,6 @@
-## Автоматическая сборка прошивки Padavan на серверах GitHub
+## Automatic Padavan firmware builds using GitHub servers
 
-### Использование
+### Usage
 
 - [Fork this repository](https://github.com/shvchk/padavan-builder-workflow/fork), further steps perform in your fork
 
