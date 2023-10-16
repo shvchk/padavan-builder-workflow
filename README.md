@@ -49,6 +49,13 @@
   If you can't figure out the problen on your own, you can ask community or firmware developer for help. In this case don't forget to attach the log archive.
 
 
+### Updating your fork
+
+To sync your fork with its origin repository, just click "Sync fork" at the top of the main page of your fork:
+
+![sync fork](misc/sync-fork.webp)
+
+
 ### Advanced usage
 
 You can set firmware repository, branch, specific tag or commit in [`variables`](variables) file.
