@@ -10,15 +10,15 @@
 
   Build config template can be found in the [firmware repository](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
 
-- Run build process: Actions → Build firmware → Run workflow
+- Run the build process: Actions → Build firmware → Run workflow
 
   ![run workflow](misc/run-workflow.webp)
 
-  Build process will be shown on the same page (if it doesn't show, just refresh page). You can get process details by clicking on it.
+  The build process will appear on the same page (if it doesn't appear, just refresh the page). You can get process details by clicking on it.
 
-  Depending on build config, build process usually takes from 10 to 60 minutes.
+  Depending on the build config, build process usually takes from 10 to 60 minutes.
 
-- While process is in progress, its status indicator would be gold-ish circle
+- While the process is in progress, its status indicator would be gold-ish circle
 
   ![workflow status progress](misc/workflow-status-in-progress.webp)
 
@@ -30,7 +30,7 @@
 
   ![workflow artifacts](misc/workflow-artifacts.webp)
 
-  Firmware license does not allow binaries distribution, so this archive would be stored for 7 days for personal use.
+  Firmware license does not permit binaries distribution, so artifacts are stored for 7 days for personal use.
 
 - If the process finishes with an error, its status indicator would turn red with a cross
 
@@ -40,15 +40,15 @@
 
   ![workflow details fail](misc/workflow-details-fail.webp)
 
-  Job report will open:
+  Job report will be opened:
 
   ![workflow details get logs](misc/workflow-details-get-logs.webp)
 
-  Here we can quickly see that it was "Check firmware size" step that failed — it's marked with a red circle with a cross. Specific reason is shown below: Firmware size (18443033) exceeds max size (16187392) — i.e. firmware is too big for target device.
+  Here we can quickly see that it was "Check firmware size" step that failed — it is marked with a red circle with a cross. Specific reason is shown below: Firmware size (18443033) exceeds max size (16187392) — i.e. built firmware is too big for the target device.
 
-  In case of any error reason is always shown at the end of the log, as in the example above. To view full log click on the cog icon in the top right corner → View raw logs. You can also download compressed log archive with Download log archive.
+  In case of any error its reason is usually shown at the end of the log, as in the example above. To view full log click on the cog ⚙️ icon in the top right corner → View raw logs. You can also download compressed log archive in the same menu → Download log archive.
 
-  If you can't figure out the problen on your own, you can ask community or firmware developer for help. In this case don't forget to attach the log archive.
+  If you can't figure out the problem on your own, you can ask community or firmware developer for help. In this case don't forget to attach the log archive.
 
 
 ### Updating your fork
@@ -60,11 +60,12 @@ To sync your fork with its origin repository, just click "Sync fork" at the top 
 
 ### Advanced usage
 
-You can set firmware repository, branch, specific tag or commit in [`variables`](variables) file.
+You can set the firmware repository, branch, specific tag or commit in [`variables`](variables) file.
 
-You can also create `pre-build.sh` script with any custom commands, which will be executed just before build process. By that time firmware source code is already downloaded, so you can add or change anything in it.
+You can also create a `pre-build.sh` script with any custom commands, which will be executed just before build process. By that time firmware source code is already downloaded, so you can add or change anything in it.
 
-You can also create `post-build.sh` script, which will be executed right after build process.
+You can also create a `post-build.sh` script, which will be executed right after build process.
+
 
 ---
 
