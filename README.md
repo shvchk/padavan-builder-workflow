@@ -1,3 +1,5 @@
+<p align="right">English | <a href="README.ru.md">Русский</a></p>
+
 ## Automatic Padavan firmware builds using GitHub servers
 
 ### Usage
