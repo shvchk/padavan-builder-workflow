@@ -134,6 +134,8 @@ jobs:
         fw_size="$(stat -c %s padavan-ng/trunk/images/*.trx)"
 
         if ((fw_size > max_fw_size)); then
-          echo "Firmware size ($fw_size) exceeds max size ($max_fw_size)"
+          fw_size_fmtd="$(numfmt --grouping "$fw_size") bytes"
+          max_fw_size_fmtd="$(numfmt --grouping "$max_fw_size") bytes"
+          echo "Firmware size ($fw_size_fmtd) exceeds max size ($max_fw_size_fmtd) for your target device"
           exit 1
         fi
