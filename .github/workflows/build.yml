@@ -99,6 +99,17 @@ jobs:
         git checkout "$PADAVAN_COMMIT"
         wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
 
+    - name: Install themes
+      run: |
+        if (( ${#PADAVAN_THEMES[@]} )); then
+          git clone --depth 1 "$PADAVAN_THEMES_REPO" themes
+          cp -r themes/common-theme themes/jquery.js padavan-ng/trunk/user/www/n56u_ribbon_fixed
+
+          for theme in "${PADAVAN_THEMES[@]}"; do
+            cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
+          done
+        fi
+
     - name: Run custom pre-build script
       run: '[[ -f pre-build.sh ]] && . pre-build.sh || :'
 
