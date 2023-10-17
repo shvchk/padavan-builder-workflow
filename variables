@@ -9,7 +9,6 @@ PADAVAN_THEMES_REPO="https://github.com/shvchk/padavan-themes.git"
 PADAVAN_THEMES=(
 #  "blue"
 #  "blue2"
-#  "common"
 #  "grey"
 #  "grey2"
 #  "white"
