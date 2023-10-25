@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt remove '~i ~nclang-tidy' -y
+        sudo apt remove '~i (~nclang-tidy|~nswig)' -y
         sudo apt install --no-install-recommends -y \
                  autoconf \
                  autoconf-archive \
