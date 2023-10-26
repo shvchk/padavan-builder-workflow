@@ -44,7 +44,7 @@
 
   ![workflow details get logs](misc/workflow-details-get-logs.webp)
 
-  Here we can quickly see that it was "Check firmware size" step that failed — it is marked with a red circle with a cross. Specific reason is shown below: Firmware size (18443033) exceeds max size (16187392) — i.e. built firmware is too big for the target device.
+  Here it's immediately obvious that it was "Check firmware size" step that failed — it is marked with a red circle with a cross. Specific reason is shown below: *Firmware size (18,492,849 bytes) exceeds max size (16,187,392 bytes) for your target device* — i.e. built firmware size is too big for the target device.
 
   In case of any error its reason is usually shown at the end of the log, as in the example above. To view full log click on the cog ⚙️ icon in the top right corner → View raw logs. You can also download compressed log archive in the same menu → Download log archive.
 
