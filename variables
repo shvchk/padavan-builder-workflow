@@ -5,6 +5,7 @@ PADAVAN_TOOLCHAIN_URL="https://gitlab.com/api/v4/projects/hadzhioglu%2Fpadavan-n
 
 PADAVAN_THEMES_REPO="https://github.com/shvchk/padavan-themes.git"
 #PADAVAN_THEMES_REPO="https://github.com/shvchk/padavan-themes-lite.git"
+PADAVAN_THEMES_BRANCH="main"
 
 PADAVAN_THEMES=(
 #  blue
