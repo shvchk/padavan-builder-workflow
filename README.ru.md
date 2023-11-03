@@ -10,7 +10,7 @@
 
   Шаблон конфига для вашего устройства можно взять в [репозитории прошивки](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
 
-- Запустите сборку: Actions → Build firmware → Run workflow
+- Запустите сборку: [Actions](../../actions) → [Build firmware](../../actions/workflows/build.yml) → Run workflow
 
   ![run workflow](misc/run-workflow.webp)
 
@@ -53,7 +53,7 @@
 
 ### Обновление форка
 
-Чтобы синхронизировать ваш форк с репозиторием-источником, просто нажмите Sync fork в верхней части главной страницы вашего форка:
+Чтобы синхронизировать ваш форк с репозиторием-источником, просто нажмите *Sync fork* → *Update branch* в верхней части главной страницы вашего форка:
 
 ![sync fork](misc/sync-fork.webp)
 
