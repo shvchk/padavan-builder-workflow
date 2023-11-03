@@ -10,7 +10,7 @@
 
   Build config template can be found in the [firmware repository](https://gitlab.com/hadzhioglu/padavan-ng/-/tree/master/trunk/configs/templates)
 
-- Run the build process: Actions → Build firmware → Run workflow
+- Run the build process: [Actions](../../actions) → [Build firmware](../../actions/workflows/build.yml) → Run workflow
 
   ![run workflow](misc/run-workflow.webp)
 
@@ -44,7 +44,7 @@
 
   ![workflow details get logs](misc/workflow-details-get-logs.webp)
 
-  Here it's immediately obvious that it was "Check firmware size" step that failed — it is marked with a red circle with a cross. Specific reason is shown below: *Firmware size (18,492,849 bytes) exceeds max size (16,187,392 bytes) for your target device* — i.e. built firmware size is too big for the target device.
+  Here it's immediately obvious that it was *Check firmware size* step that failed — it is marked with a red circle with a cross. Specific reason is shown below: *Firmware size (18,492,849 bytes) exceeds max size (16,187,392 bytes) for your target device* — i.e. built firmware size is too big for the target device.
 
   In case of any error its reason is usually shown at the end of the log, as in the example above. To view full log click on the cog ⚙️ icon in the top right corner → View raw logs. You can also download compressed log archive in the same menu → Download log archive.
 
@@ -53,7 +53,7 @@
 
 ### Updating your fork
 
-To sync your fork with its origin repository, just click "Sync fork" at the top of the main page of your fork:
+To sync your fork with its origin repository, just click *Sync fork* → *Update branch* at the top of the main page of your fork:
 
 ![sync fork](misc/sync-fork.webp)
 
