@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: registry.gitlab.com/hadzhioglu/padavan-ng
+    container: registry.gitlab.com/a-shevchuk/padavan-ng
     defaults: { run: { shell: bash } }
     steps:
     - uses: actions/checkout@v4
