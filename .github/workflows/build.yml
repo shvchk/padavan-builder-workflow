@@ -17,7 +17,16 @@ jobs:
     - name: Get variables
       run: |
         sed -i 's|\r$||g' variables build.config
-        . <(cat variables build.config)
+        . <(cat variables)
+        if [[ -n "$PADAVAN_CONFIG" ]] && [ "$PADAVAN_CONFIG" != "build.config" ]; then
+          regex="(https?|ftp|file)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]"
+          if [[ "$PADAVAN_CONFIG" =~ $regex ]]; then
+            wget "$PADAVAN_CONFIG" -qO build.config
+          else
+            cp "$PADAVAN_CONFIG" build.config
+          fi
+        fi
+        . <(cat build.config)
         PADAVAN_THEMES="${PADAVAN_THEMES[*]}"
         for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
           echo "$v=${!v}" >> $GITHUB_ENV
