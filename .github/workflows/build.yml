@@ -62,12 +62,12 @@ jobs:
                         -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
         cp "padavan-ng/trunk/images/$FW_FILE_NAME" .
         echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
-        echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+        echo "BUILD_VERSION=${FW_FILE_NAME%.*}" >> $GITHUB_ENV
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: padavan-ng_${{ env.CONFIG_VENDOR }}_${{ env.CONFIG_FIRMWARE_PRODUCT_ID }}_${{ env.BUILD_TIMESTAMP }}
+        name: ${{ env.CONFIG_VENDOR }}_${{ env.BUILD_VERSION }}
         retention-days: 7
         path: |
           ${{ env.FW_FILE_NAME }}
