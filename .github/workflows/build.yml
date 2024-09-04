@@ -16,19 +16,10 @@ jobs:
 
     - name: Get variables
       run: |
-        sed -i 's|\r$||g' variables build.config
+        sed -i 's|\r$||g' variables
         . <(cat variables)
-        if [[ -n "$PADAVAN_CONFIG" ]] && [ "$PADAVAN_CONFIG" != "build.config" ]; then
-          regex="(https?|ftp|file)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]"
-          if [[ "$PADAVAN_CONFIG" =~ $regex ]]; then
-            wget "$PADAVAN_CONFIG" -qO build.config
-          else
-            cp "$PADAVAN_CONFIG" build.config
-          fi
-        fi
-        . <(cat build.config)
         PADAVAN_THEMES="${PADAVAN_THEMES[*]}"
-        for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
+        for v in "${!PADAVAN_@}"; do
           echo "$v=${!v}" >> $GITHUB_ENV
         done
 
@@ -38,6 +29,22 @@ jobs:
         git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
         git -C padavan-ng checkout "$PADAVAN_COMMIT"
         wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+
+    - name: Get config
+      run: |
+        if [[ -n "$PADAVAN_CONFIG" ]] && [ "$PADAVAN_CONFIG" != "build.config" ]; then
+          regex="(https?|ftp|file)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]"
+          if [[ "$PADAVAN_CONFIG" =~ $regex ]]; then
+            wget "$PADAVAN_CONFIG" -qO build.config
+          else
+            cp "$PADAVAN_CONFIG" build.config
+          fi
+        fi
+        sed -i 's|\r$||g' build.config
+        . <(cat build.config)
+        for v in "${!CONFIG_@}"; do
+          echo "$v=${!v}" >> $GITHUB_ENV
+        done
 
     - name: Install themes
       run: |
