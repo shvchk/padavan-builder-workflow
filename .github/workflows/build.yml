@@ -25,6 +25,7 @@ jobs:
 
     - name: Download sources and toolchain
       run: |
+        git config --global http.version HTTP/1.1
         git config --global --add safe.directory '*'
         git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
         git -C padavan-ng checkout "$PADAVAN_COMMIT"
