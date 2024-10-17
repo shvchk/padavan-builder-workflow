@@ -15,6 +15,7 @@ jobs:
       - run: gh pr close "$PR_NUM" -c "$COMMENT"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           PR_NUM: ${{ github.event.number }}
           COMMENT: |
             **Please read what a pull request is:**
