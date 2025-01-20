@@ -1,0 +1,22 @@
+name: Close inappropriate PR
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+    paths:
+      - 'build.config'
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - run: gh pr close "$PR_NUM" -c "$COMMENT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.number }}
+          COMMENT: |
+            **Please read what a pull request is:**
+            https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests
