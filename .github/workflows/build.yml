@@ -1,87 +1,264 @@
-name: Build firmware
+### Target Vendor/Product (support only Ralink RT3883/MT7620/MT7621/MT7628)
+CONFIG_VENDOR=SERCOMM
+CONFIG_PRODUCT=MT7621
 
-on:
-  workflow_dispatch:
-  push:
-    tags:
-      - '*'
+### Target ProductID (board select, max 12 symbols)
+CONFIG_FIRMWARE_PRODUCT_ID="SMBXTURBO"
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    container: registry.gitlab.com/hadzhioglu/padavan-ng
-    defaults: { run: { shell: bash } }
-    steps:
-    - uses: actions/checkout@v4
+############################################################
+### Linux kernel configuration
+############################################################
 
-    - name: Get variables
-      run: |
-        sed -i 's|\r$||g' variables build.config
-        . <(cat variables build.config)
-        PADAVAN_THEMES="${PADAVAN_THEMES[*]}"
-        for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
-          echo "$v=${!v}" >> $GITHUB_ENV
-        done
+### Force MT7621 CPU clock to 900MHz (override Uboot settings)
+#CONFIG_FIRMWARE_CPU_900MHZ=y
 
-    - name: Download sources and toolchain
-      run: |
-        git config --global --add safe.directory '*'
-        git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
-        git -C padavan-ng checkout "$PADAVAN_COMMIT"
-        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+### Enable MT7621 CPU sleep mode (downclock to 220MHz on idle)
+#CONFIG_FIRMWARE_CPU_SLEEP=y
 
-    - name: Install themes
-      run: |
-        if [[ -n $PADAVAN_THEMES ]]; then
-          git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
-          cp -r themes/common-theme themes/jquery.js padavan-ng/trunk/user/www/n56u_ribbon_fixed
+### Kernel driver select for WiFi AP 2.4GHz
+### 4.1 = MT7603E v4.1.0.0
+CONFIG_FIRMWARE_WIFI2_DRIVER=4.1
 
-          for theme in $PADAVAN_THEMES; do
-            echo "Installing $theme theme"
-            cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
-          done
-        fi
+### Kernel driver select for WiFi AP 2.4GHz/5GHz
+### 4.4.2.1 = MT7615 v4.4.2.1
+#CONFIG_FIRMWARE_WIFI_DRIVER=4.4.2.1
+CONFIG_FIRMWARE_WIFI_DRIVER=5.0.4.0
 
-    - name: Run custom pre-build script
-      run: '[[ -f pre-build.sh ]] && . pre-build.sh || :'
+### Enable IPv6 support
+CONFIG_FIRMWARE_ENABLE_IPV6=y
 
-    - name: Build firmware
-      run: |
-        cp build.config padavan-ng/trunk/.config
-        pushd padavan-ng/trunk
-        ./clear_tree.sh
-        ./build_firmware.sh
-        popd
+### Enable USB support
+CONFIG_FIRMWARE_ENABLE_USB=y
 
-    - name: Run custom post-build script
-      run: '[[ -f post-build.sh ]] && . post-build.sh || :'
+### Enable FAT/FAT32 filesystem support. ~0.1MB
+#CONFIG_FIRMWARE_ENABLE_FAT=y
 
-    - name: Prepare artifacts
-      run: |
-        FW_FILE_NAME="$(find padavan-ng/trunk/images -type f -regextype posix-extended -iregex ".*\.(trx|bin)$" \
-                        -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
-        cp "padavan-ng/trunk/images/$FW_FILE_NAME" .
-        echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
-        echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+### Enable exFAT (FAT/FAT32 too) filesystem support. ~0.12MB
+CONFIG_FIRMWARE_ENABLE_EXFAT=y
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: padavan-ng_${{ env.CONFIG_VENDOR }}_${{ env.CONFIG_FIRMWARE_PRODUCT_ID }}_${{ env.BUILD_TIMESTAMP }}
-        retention-days: 7
-        path: |
-          ${{ env.FW_FILE_NAME }}
-          build.config
+### Enable EXT2 filesystem support. ~0.1MB
+#CONFIG_FIRMWARE_ENABLE_EXT2=y
 
-    - name: Check firmware size
-      run: |
-        partitions=padavan-ng/trunk/configs/boards/$CONFIG_VENDOR/$CONFIG_FIRMWARE_PRODUCT_ID/partitions.config
-        max_fw_size="$(awk '/Firmware/ { getline; getline; sub(",", ""); print strtonum($2); }' "$partitions")"
-        fw_size="$(stat -c %s "$FW_FILE_NAME")"
+### Enable EXT3 filesystem support. ~0.2MB
+#CONFIG_FIRMWARE_ENABLE_EXT3=y
 
-        if ((fw_size > max_fw_size)); then
-          fw_size_fmtd="$(numfmt --grouping "$fw_size") bytes"
-          max_fw_size_fmtd="$(numfmt --grouping "$max_fw_size") bytes"
-          echo "Firmware size ($fw_size_fmtd) exceeds max size ($max_fw_size_fmtd) for your target device"
-          exit 1
-        fi
+### Enable EXT4 (EXT3/2 too) filesystem support. ~0.4MB
+CONFIG_FIRMWARE_ENABLE_EXT4=y
+
+### Enable XFS filesystem support. ~0.6MB
+CONFIG_FIRMWARE_ENABLE_XFS=y
+
+### Enable Apple HFS+ filesystem support. ~0.1MB
+CONFIG_FIRMWARE_ENABLE_HFS=y
+
+### Enable FUSE (filesystems in userspace) support. ~0.1MB
+CONFIG_FIRMWARE_ENABLE_FUSE=y
+
+### Enable swap files/partitions support. ~0.05MB
+CONFIG_FIRMWARE_ENABLE_SWAP=y
+
+### Include UVC camera modules. ~0.2MB
+CONFIG_FIRMWARE_INCLUDE_UVC=y
+
+### Include USB-HID modules. ~0.2MB
+CONFIG_FIRMWARE_INCLUDE_HID=y
+
+### Include USB-Serial modules (e.g. pl2303). ~0.03MB
+CONFIG_FIRMWARE_INCLUDE_SERIAL=y
+
+### Include USB-Audio modules ~0.46MB
+CONFIG_FIRMWARE_INCLUDE_AUDIO=y
+
+### Include XFRM (IPsec) modules & iptables extension ~ 0.2MB
+CONFIG_FIRMWARE_INCLUDE_XFRM=y
+
+### Include network QoS scheduling modules. ~0.2MB
+#CONFIG_FIRMWARE_INCLUDE_QOS=y
+
+### Include IMQ module for shapers (a bit of performance degradation). ~0.02MB
+#CONFIG_FIRMWARE_INCLUDE_IMQ=y
+
+### Include IFB module for shapers. ~0.03MB
+#CONFIG_FIRMWARE_INCLUDE_IFB=y
+
+### Include IPSet utility and kernel modules. ~0.4MB
+CONFIG_FIRMWARE_INCLUDE_IPSET=y
+
+### Include NFSv3 server. ~0.6MB
+CONFIG_FIRMWARE_INCLUDE_NFSD=y
+
+### Include NFSv3 client. ~0.5MB
+CONFIG_FIRMWARE_INCLUDE_NFSC=y
+
+### Include CIFS (SMB) client. ~0.2MB
+CONFIG_FIRMWARE_INCLUDE_CIFS=y
+
+### Include Shortcut Forward Engine
+CONFIG_FIRMWARE_INCLUDE_SHORTCUT_FE=y
+
+### Включить сборку бэкпортированных драйверов для медиа устройств
+#CONFIG_FIRMWARE_ENABLE_BACKPORTED=y
+### Поместить бэкпортированный драйвера в образ прошивки
+### (в противном случае они будут собраны в отдельный архив для размещения в /opt/lib/)
+#CONFIG_FIRMWARE_INCLUDE_BACKPORTED=y
+
+############################################################
+### Userspace configuration
+############################################################
+
+### Include WebUI international resources. Increased firmware size
+#CONFIG_FIRMWARE_INCLUDE_LANG_BR=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_CN=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_CZ=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_DA=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_DE=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_ES=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_FI=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_FR=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_NO=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_PL=y
+CONFIG_FIRMWARE_INCLUDE_LANG_RU=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_SV=y
+#CONFIG_FIRMWARE_INCLUDE_LANG_UK=y
+
+### Include NTFS-3G FUSE driver (instead of Paragon "ufsd"). ~0.4MB
+CONFIG_FIRMWARE_INCLUDE_NTFS_3G=y
+
+### Include LPR printer daemon. ~0.12MB
+CONFIG_FIRMWARE_INCLUDE_LPRD=y
+
+### Include USB-over-Ethernet printer daemon. ~0.05MB
+CONFIG_FIRMWARE_INCLUDE_U2EC=y
+
+### Include "tcpdump" utility. ~0.6MB
+CONFIG_FIRMWARE_INCLUDE_TCPDUMP=y
+
+### Include "socat" utility ~0.3MB
+#CONFIG_FIRMWARE_INCLUDE_SOCAT=y
+
+### Include "hdparm" utility (allow set HDD spindown timeout and APM). ~0.1MB
+CONFIG_FIRMWARE_INCLUDE_HDPARM=y
+
+### Include "parted" utility (allow make GPT partitions). ~0.3MB
+CONFIG_FIRMWARE_INCLUDE_PARTED=y
+
+### Include SMB (and WINS) server. ~1.5MB
+CONFIG_FIRMWARE_INCLUDE_SMBD=y
+
+### Include WINS server only. ~0.4MB
+#CONFIG_FIRMWARE_INCLUDE_WINS=y
+
+### Include syslog for SMB and WINS server. ~0.3MB
+CONFIG_FIRMWARE_INCLUDE_SMBD_SYSLOG=y
+
+### Include FTP server. ~0.2MB
+CONFIG_FIRMWARE_INCLUDE_FTPD=y
+CONFIG_FIRMWARE_INCLUDE_FTPD_SSL=y
+
+### Include alternative L2TP control client RP-L2TP. ~0.1MB
+CONFIG_FIRMWARE_INCLUDE_RPL2TP=y
+
+### Include EAP-TTLS and EAP-PEAP authentication support. openssl ~1.2MB, wpa_supplicant +0.04MB
+CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=y
+
+### Include HTTPS support for DDNS client. openssl ~1.2MB
+CONFIG_FIRMWARE_INCLUDE_DDNS_SSL=y
+
+### Include HTTPS support. openssl ~1.2MB
+CONFIG_FIRMWARE_INCLUDE_HTTPS=y
+
+### Include sftp-server. openssl ~1.2MB, sftp-server ~0.06MB
+CONFIG_FIRMWARE_INCLUDE_SFTP=y
+
+### Include dropbear SSH. ~0.3MB
+#CONFIG_FIRMWARE_INCLUDE_DROPBEAR=y
+
+### Make the dropbear symmetrical ciphers and hashes faster. ~0.06MB
+#CONFIG_FIRMWARE_INCLUDE_DROPBEAR_FAST_CODE=y
+
+### Include OpenSSH instead of dropbear. openssl ~1.2MB, openssh ~1.0MB
+CONFIG_FIRMWARE_INCLUDE_OPENSSH=y
+
+### Include OpenVPN. IPv6 required. openssl ~1.2MB, openvpn ~0.4MB
+CONFIG_FIRMWARE_INCLUDE_OPENVPN=y
+
+### Include StrongSwan. XFRM modules ~0.2MB, strongswan ~0.7MB
+CONFIG_FIRMWARE_INCLUDE_SSWAN=y
+
+### Include Wireguard VPN module and utilite
+CONFIG_FIRMWARE_INCLUDE_WIREGUARD=y
+
+### Include Elliptic Curves (EC) to openssl library. ~0.1MB
+CONFIG_FIRMWARE_INCLUDE_OPENSSL_EC=y
+
+### Include "openssl" executable for generate certificates. ~0.4MB
+CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y
+
+### Include xUPNPd IPTV mediaserver. ~0.3MB
+CONFIG_FIRMWARE_INCLUDE_XUPNPD=y
+
+### Include Minidlna UPnP mediaserver. ~1.6MB
+CONFIG_FIRMWARE_INCLUDE_MINIDLNA=y
+
+### Include Transmission torrent. openssl ~1.2MB, transmission ~1.5MB
+CONFIG_FIRMWARE_INCLUDE_TRANSMISSION=y
+
+### Include Transmission-Web-Control (advanced WebUI). ~0.8MB
+CONFIG_FIRMWARE_INCLUDE_TRANSMISSION_WEB_CONTROL=y
+
+### Include Aria2 download manager. openssl ~1.2MB, aria2 ~3.5MB
+CONFIG_FIRMWARE_INCLUDE_ARIA=y
+
+### Include Aria2 WEB control. ~0.7MB
+CONFIG_FIRMWARE_INCLUDE_ARIA_WEB_CONTROL=y
+
+### Include TOR proxy ~2.3MB
+CONFIG_FIRMWARE_INCLUDE_TOR=y
+
+### Include GeoIP database info for TOR proxy ~1.1MB
+CONFIG_FIRMWARE_INCLUDE_TOR_GEOIP=y
+
+### Include IPv6 GeoIP database info for TOR proxy ~1.1MB
+#CONFIG_FIRMWARE_INCLUDE_TOR_GEOIPV6=y
+
+### Include OBFS4 for TOR ~6.1MB
+#CONFIG_FIRMWARE_INCLUDE_OBFS4=y
+
+### Include Privoxy proxy ~0.3MB
+CONFIG_FIRMWARE_INCLUDE_PRIVOXY=y
+
+### Include DNSCrypt proxy ~0.5MB
+CONFIG_FIRMWARE_INCLUDE_DNSCRYPT=y
+
+### Include Stubby DNS-over-TLS (DoT) ~0.5MB
+CONFIG_FIRMWARE_INCLUDE_STUBBY=y
+
+### Include doh_proxy DNS-over-HTTPS (DoH) ~0.4MB
+CONFIG_FIRMWARE_INCLUDE_DOH=y
+
+### Include WPAD support
+CONFIG_FIRMWARE_INCLUDE_WPAD=y
+
+### Include compressed memory support
+CONFIG_FIRMWARE_INCLUDE_ZRAM=y
+
+### Add adb package
+#CONFIG_FIRMWARE_INCLUDE_ADB=y
+
+### Include LUA support ~0.2MB
+CONFIG_FIRMWARE_INCLUDE_LUA=y
+
+### Include EoIP Ethernet Tunnels over IP ~0.01MB
+CONFIG_FIRMWARE_INCLUDE_EOIP=y
+
+### Include Curl support ~0.15MB
+CONFIG_FIRMWARE_INCLUDE_CURL=y
+
+### Include KMS Activation support ~0.06MB
+#CONFIG_FIRMWARE_INCLUDE_VLMCSD=y
+
+### Include iPerf3 support ~0.13MB
+#CONFIG_FIRMWARE_INCLUDE_IPERF3=y
+
+### Include mt7621_cpufreq support ~0.005MB
+#CONFIG_FIRMWARE_INCLUDE_MT7621_CPUFREQ=y
