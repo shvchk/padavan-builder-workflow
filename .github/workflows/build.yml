@@ -48,20 +48,21 @@ jobs:
     - name: Build firmware
       run: |
         cp build.config padavan-ng/trunk/.config
-        pushd padavan-ng/trunk
+        cd padavan-ng/trunk
         ./clear_tree.sh
         ./build_firmware.sh
-        popd
+
+        FW_FILE_NAME="$(find images -type f -regextype posix-extended -iregex ".*\.(trx|bin)$" \
+                        -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
+        [[ -n $FW_FILE_NAME ]] || { echo "Firmware file not found"; exit 1; }
+        echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
 
     - name: Run custom post-build script
       run: '[[ -f post-build.sh ]] && . post-build.sh || :'
 
     - name: Prepare artifacts
       run: |
-        FW_FILE_NAME="$(find padavan-ng/trunk/images -type f -regextype posix-extended -iregex ".*\.(trx|bin)$" \
-                        -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
         cp "padavan-ng/trunk/images/$FW_FILE_NAME" .
-        echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
         echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
 
     - name: Upload artifacts
