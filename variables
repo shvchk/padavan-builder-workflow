@@ -8,10 +8,10 @@ PADAVAN_THEMES_REPO="https://gitlab.com/hadzhioglu/padavan-themes.git"
 PADAVAN_THEMES_BRANCH="main"
 
 PADAVAN_THEMES=(
-#  blue
-#  blue2
-#  grey
-#  grey2
-#  white
-#  yellow
+  blue
+  blue2
+  grey
+  grey2
+  white
+  yellow
 )
