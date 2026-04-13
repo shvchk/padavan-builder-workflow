@@ -1,88 +1,72 @@
-name: Build firmware
 
-on:
-  workflow_dispatch:
-  push:
-    tags:
-      - '*'
+### Target Vendor/Product
+CONFIG_VENDOR=ASUS
+CONFIG_PRODUCT=MT7620
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    container: registry.gitlab.com/hadzhioglu/padavan-ng
-    defaults: { run: { shell: bash } }
-    steps:
-    - uses: actions/checkout@v4
+### Target ProductID
+CONFIG_FIRMWARE_PRODUCT_ID="RT-N11P"
 
-    - name: Get variables
-      run: |
-        sed -i 's|\r$||g' variables build.config
-        . <(cat variables build.config)
-        PADAVAN_THEMES="${PADAVAN_THEMES[*]}"
-        for v in "${!PADAVAN_@}" "${!CONFIG_@}"; do
-          echo "$v=${!v}" >> $GITHUB_ENV
-        done
+############################################################
+### Linux kernel configuration
+############################################################
 
-    - name: Download sources and toolchain
-      run: |
-        git config --global --add safe.directory '*'
-        git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
-        git -C padavan-ng checkout "$PADAVAN_COMMIT"
-        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+### Стабильный разгон до 600MHz для работы NFQWS/VPN
+CONFIG_FIRMWARE_CPU_600MHZ=y
+CONFIG_FIRMWARE_CPU_SLEEP=n
 
-    - name: Install themes
-      run: |
-        if [[ -n $PADAVAN_THEMES ]]; then
-          git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
-          cp -r themes/common-theme themes/jquery.js padavan-ng/trunk/user/www/n56u_ribbon_fixed
+### Лучший драйвер Wi-Fi для MT7620
+CONFIG_FIRMWARE_WIFI2_DRIVER=3.0
 
-          for theme in $PADAVAN_THEMES; do
-            echo "Installing $theme theme"
-            cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
-          done
-        fi
+### Сетевые функции (IPv6 и Ускоритель трафика SFE - ОБЯЗАТЕЛЬНО)
+CONFIG_FIRMWARE_ENABLE_IPV6=y
+CONFIG_FIRMWARE_INCLUDE_SHORTCUT_FE=y
+CONFIG_FIRMWARE_INCLUDE_IPSET=y
 
-    - name: Run custom pre-build script
-      run: '[[ -f pre-build.sh ]] && . pre-build.sh || :'
+### Отключаем лишние модули ядра для экономии RAM
+CONFIG_FIRMWARE_INCLUDE_XFRM=n
+CONFIG_FIRMWARE_INCLUDE_QOS=n
+CONFIG_FIRMWARE_INCLUDE_IMQ=n
+CONFIG_FIRMWARE_INCLUDE_IFB=n
+CONFIG_FIRMWARE_INCLUDE_NFSC=n
+CONFIG_FIRMWARE_INCLUDE_CIFS=n
 
-    - name: Build firmware
-      run: |
-        cp build.config padavan-ng/trunk/.config
-        cd padavan-ng/trunk
-        ./clear_tree.sh
-        ./build_firmware.sh
+############################################################
+### Userspace configuration
+############################################################
 
-        FW_FILE_NAME="$(find images -type f -regextype posix-extended -iregex ".*\.(trx|bin)$" \
-                        -printf "%T@\t%f\n" | sort -V | tail -1 | cut -f2)"
-        [[ -n $FW_FILE_NAME ]] || { echo "Firmware file not found"; exit 1; }
-        echo "FW_FILE_NAME=$FW_FILE_NAME" >> $GITHUB_ENV
+### Язык только Русский (экономим Flash)
+CONFIG_FIRMWARE_INCLUDE_LANG_RU=y
 
-    - name: Run custom post-build script
-      run: '[[ -f post-build.sh ]] && . post-build.sh || :'
+### Базовые сервисы и безопасность
+CONFIG_FIRMWARE_INCLUDE_DROPBEAR=y
+CONFIG_FIRMWARE_INCLUDE_DROPBEAR_FAST_CODE=y
+CONFIG_FIRMWARE_INCLUDE_HTTPS=y
+CONFIG_FIRMWARE_INCLUDE_OPENSSL_EC=y
+CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n
 
-    - name: Prepare artifacts
-      run: |
-        cp "padavan-ng/trunk/images/$FW_FILE_NAME" .
-        echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+### Средства обхода блокировок (ОСТАВЛЕНО САМОЕ НУЖНОЕ)
+CONFIG_FIRMWARE_INCLUDE_NFQWS=y
+CONFIG_FIRMWARE_INCLUDE_WIREGUARD=y
+CONFIG_FIRMWARE_INCLUDE_AMNEZIAWG=y
+CONFIG_FIRMWARE_INCLUDE_DOH=y
+CONFIG_FIRMWARE_INCLUDE_CURL=y
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: padavan-ng_${{ env.CONFIG_VENDOR }}_${{ env.CONFIG_FIRMWARE_PRODUCT_ID }}_${{ env.BUILD_TIMESTAMP }}
-        retention-days: 7
-        path: |
-          ${{ env.FW_FILE_NAME }}
-          build.config
+### ОТКЛЮЧЕНО (избыточные DNS-сервисы для экономии 32MB RAM)
+CONFIG_FIRMWARE_INCLUDE_DNSCRYPT=n
+CONFIG_FIRMWARE_INCLUDE_STUBBY=n
 
-    - name: Check firmware size
-      run: |
-        partitions=padavan-ng/trunk/configs/boards/$CONFIG_VENDOR/$CONFIG_FIRMWARE_PRODUCT_ID/partitions.config
-        max_fw_size="$(awk '/Firmware/ { getline; getline; sub(",", ""); print strtonum($2); }' "$partitions")"
-        fw_size="$(stat -c %s "$FW_FILE_NAME")"
+### ОТКЛЮЧЕНО (тяжелые утилиты, не влезающие в лимит стабильности)
+CONFIG_FIRMWARE_INCLUDE_TCPDUMP=n
+CONFIG_FIRMWARE_INCLUDE_IPERF3=n
+CONFIG_FIRMWARE_INCLUDE_SFTP=n
+CONFIG_FIRMWARE_INCLUDE_NDISC6_RDISC6=n
 
-        if ((fw_size > max_fw_size)); then
-          fw_size_fmtd="$(numfmt --grouping "$fw_size") bytes"
-          max_fw_size_fmtd="$(numfmt --grouping "$max_fw_size") bytes"
-          echo "Firmware size ($fw_size_fmtd) exceeds max size ($max_fw_size_fmtd) for your target device"
-          exit 1
-        fi
+### Системные оптимизации (ZRAM - СПАСЕНИЕ ДЛЯ 32MB RAM)
+CONFIG_FIRMWARE_INCLUDE_ZRAM=y
+CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+
+### Прочее (выключено)
+CONFIG_FIRMWARE_INCLUDE_USBIP=n
+CONFIG_FIRMWARE_INCLUDE_TOR=n
+CONFIG_FIRMWARE_INCLUDE_PRIVOXY=n
+CONFIG_FIRMWARE_INCLUDE_LUA=n
