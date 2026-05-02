@@ -26,19 +26,19 @@ jobs:
     - name: Download sources and toolchain
       run: |
         git config --global --add safe.directory '*'
-        git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
-        git -C padavan-ng checkout "$PADAVAN_COMMIT"
-        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+        git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO" $PADAVAN_ICP
+        git -C $PADAVAN_ICP checkout "$PADAVAN_COMMIT"
+        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C $PADAVAN_ICP --zstd -xf -
 
     - name: Install themes
       run: |
         if [[ -n $PADAVAN_THEMES ]]; then
           git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
-          cp -r themes/common-theme themes/jquery.js padavan-ng/trunk/user/www/n56u_ribbon_fixed
+          cp -r themes/common-theme themes/jquery.js $PADAVAN_ICP/trunk/user/www/n56u_ribbon_fixed
 
           for theme in $PADAVAN_THEMES; do
             echo "Installing $theme theme"
-            cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
+            cp -r "themes/$theme-theme" $PADAVAN_ICP/trunk/user/www/n56u_ribbon_fixed
           done
         fi
 
@@ -47,8 +47,8 @@ jobs:
 
     - name: Build firmware
       run: |
-        cp build.config padavan-ng/trunk/.config
-        cd padavan-ng/trunk
+        cp build.config $PADAVAN_ICP/trunk/.config
+        cd $PADAVAN_ICP/trunk
         ./clear_tree.sh
         ./build_firmware.sh
 
@@ -62,7 +62,7 @@ jobs:
 
     - name: Prepare artifacts
       run: |
-        cp "padavan-ng/trunk/images/$FW_FILE_NAME" .
+        cp "$PADAVAN_ICP/trunk/images/$FW_FILE_NAME" .
         echo "BUILD_TIMESTAMP=$(date '+%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
 
     - name: Upload artifacts
@@ -76,7 +76,7 @@ jobs:
 
     - name: Check firmware size
       run: |
-        partitions=padavan-ng/trunk/configs/boards/$CONFIG_VENDOR/$CONFIG_FIRMWARE_PRODUCT_ID/partitions.config
+        partitions=$PADAVAN_ICP/trunk/configs/boards/$CONFIG_VENDOR/$CONFIG_FIRMWARE_PRODUCT_ID/partitions.config
         max_fw_size="$(awk '/Firmware/ { getline; getline; sub(",", ""); print strtonum($2); }' "$partitions")"
         fw_size="$(stat -c %s "$FW_FILE_NAME")"
 
